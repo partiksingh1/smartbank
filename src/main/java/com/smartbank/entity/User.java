@@ -1,22 +1,27 @@
 package com.smartbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
+@Table(name = "users")
 public class User{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotEmpty
     private String name;
 
-    @NotEmpty
+    @JsonIgnore
     private String password;
 
     @Email
@@ -32,7 +37,8 @@ public class User{
 
     @NotEmpty
     private String address;
-//
-//    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
-//    private Acc
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts = new ArrayList<>();
+
 }
