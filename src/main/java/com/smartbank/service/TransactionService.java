@@ -1,15 +1,16 @@
 package com.smartbank.service;
 
-import com.smartbank.dto.TransactionDTO;
+import com.smartbank.dto.TransactionRequestDTO;
+import com.smartbank.dto.TransactionResponseDTO;
 
 import java.util.List;
 
 public interface TransactionService {
-    TransactionDTO createTransaction(TransactionDTO transactionDTO);
+    TransactionResponseDTO createTransaction(TransactionRequestDTO transactionDTO);
 
-    TransactionDTO getTransactionById(Long id);
+    TransactionResponseDTO getTransactionById(Long id);
 
-    List<TransactionDTO> getAllTransactions();
+    List<TransactionResponseDTO> getAllTransactions();
 
     void deleteTransaction(Long id);
 }

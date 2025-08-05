@@ -1,6 +1,7 @@
 package com.smartbank.controller;
 
-import com.smartbank.dto.TransactionDTO;
+import com.smartbank.dto.TransactionRequestDTO;
+import com.smartbank.dto.TransactionResponseDTO;
 import com.smartbank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,18 +18,18 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody TransactionDTO dto) {
-        TransactionDTO created = transactionService.createTransaction(dto);
+    public ResponseEntity<TransactionResponseDTO> createTransaction(@Valid @RequestBody TransactionRequestDTO dto) {
+        TransactionResponseDTO created = transactionService.createTransaction(dto);
         return ResponseEntity.ok(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransactionDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<TransactionResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionDTO>> getAll() {
+    public ResponseEntity<List<TransactionResponseDTO>> getAll() {
         return ResponseEntity.ok(transactionService.getAllTransactions());
     }
 
