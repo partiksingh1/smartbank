@@ -1,6 +1,4 @@
 package com.smartbank.dto;
-
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;

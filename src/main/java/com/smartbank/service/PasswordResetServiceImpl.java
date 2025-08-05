@@ -7,7 +7,6 @@ import com.smartbank.repository.PasswordResetTokenRepo;
 import com.smartbank.repository.UserRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +25,7 @@ public class PasswordResetServiceImpl implements PasswordResetService{
 
     @Override
     public void sendResetOtp(String email){
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(()->new EntityNotFoundException("No user with email: " + email));
-
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-
         PasswordResetToken token = new PasswordResetToken();
         token.setEmail(email);
         token.setOtp(otp);
