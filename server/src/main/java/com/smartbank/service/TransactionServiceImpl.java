@@ -4,12 +4,16 @@ import com.smartbank.dto.TransactionRequestDTO;
 import com.smartbank.dto.TransactionResponseDTO;
 import com.smartbank.entity.Account;
 import com.smartbank.entity.Transaction;
+import com.smartbank.entity.User;
 import com.smartbank.entity.enums.TransactionStatus;
 import com.smartbank.entity.enums.TransactionType;
+import com.smartbank.exception.UserNotFoundException;
 import com.smartbank.repository.AccountRepo;
 import com.smartbank.repository.TransactionRepo;
+import com.smartbank.repository.UserRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,8 @@ public class TransactionServiceImpl implements TransactionService{
      private final TransactionRepo transactionRepo;
      private final AccountRepo accountRepo;
      private final PasswordEncoder passwordEncoder;
+     private final UserRepo userRepo;
+
      @Override
      @Transactional
      public TransactionResponseDTO createTransaction(TransactionRequestDTO dto) {
@@ -89,7 +95,15 @@ public class TransactionServiceImpl implements TransactionService{
 
      @Override
      public List<TransactionResponseDTO> getAllTransactions() {
-          return transactionRepo.findAll().stream()
+          String email = SecurityContextHolder.getContext().getAuthentication().getName();
+          User user = userRepo.findByEmail(email)
+                  .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+          Long userId = user.getId();
+
+          List<Transaction> transactions = transactionRepo
+                  .findBySourceAccount_User_IdOrTargetAccount_User_Id(userId, userId);
+
+          return transactions.stream()
                   .map(this::mapToDTO)
                   .collect(Collectors.toList());
      }
