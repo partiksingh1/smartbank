@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
 
         LoginResponseDTO response = new LoginResponseDTO();
         response.setToken(token);
-        response.setId(user.getId());
+        response.setUser(user);
         response.setMessage("Login successful");
 
         return response;
