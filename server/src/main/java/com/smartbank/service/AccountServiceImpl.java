@@ -5,11 +5,13 @@ import com.smartbank.dto.AccountResponseDTO;
 import com.smartbank.entity.Account;
 import com.smartbank.entity.User;
 import com.smartbank.entity.enums.AccountType;
+import com.smartbank.exception.UserNotFoundException;
 import com.smartbank.repository.AccountRepo;
 import com.smartbank.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,24 +28,34 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponseDTO createAccount(AccountRequestDTO accountDTO){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
         Account account = new Account();
-        account.setAccountNumber(accountDTO.getAccountNumber());
+        account.setAccountNumber(generateRandomAccountNumber());
         account.setAccountType(AccountType.valueOf(accountDTO.getAccountType()));
         account.setBalance(accountDTO.getBalance());
         account.setBranch(accountDTO.getBranch());
         account.setPin(passwordEncoder.encode(accountDTO.getPin()));
-        User user = userRepo.findById(accountDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + accountDTO.getUserId()));
-
         account.setUser(user);
         Account savedAccount = accountRepo.save(account);
         return mapToResponseDTO(savedAccount);
     }
+    private String generateRandomAccountNumber() {
+        long min = 100000000000L; // 12-digit minimum
+        long max = 999999999999L; // 12-digit maximum
+        long randomNumber = min + (long) (Math.random() * (max - min));
+        return String.valueOf(randomNumber);
+    }
 
     @Override
-    public AccountResponseDTO getAccountById(Long id) {
-        Account account = accountRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found with ID: " + id));
+    public AccountResponseDTO getAccountByUserId() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        Long userId = user.getId();
+        Account account = accountRepo.findAccountByUser_Id(userId)
+                .orElseThrow(() -> new RuntimeException("Account not found with ID: " + userId));
 
         return modelMapper.map(account, AccountResponseDTO.class);
     }
