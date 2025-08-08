@@ -95,4 +95,11 @@ server/src/main/java/com/smartbank/
 - Custom Exceptions - Domain-specific error types
 - Validation Messages - User-friendly error messages
 - HTTP Status Codes - Proper REST response codes
+  
+<img width="1428" height="785" alt="Screenshot 2025-08-08 at 5 57 00 PM" src="https://github.com/user-attachments/assets/ec966f42-b5a6-49d1-ac43-2870ca3f9575" />
+<img width="1440" height="786" alt="Screenshot 2025-08-08 at 5 56 28 PM" src="https://github.com/user-attachments/assets/b3d92eb4-0173-4e1b-9747-77d42ab8d8eb" />
+<img width="1436" height="785" alt="Screenshot 2025-08-08 at 5 56 21 PM" src="https://github.com/user-attachments/assets/8b6eb30b-3515-4361-af56-c3269a90a6ed" />
+<img width="1440" height="784" alt="Screenshot 2025-08-08 at 5 57 12 PM" src="https://github.com/user-attachments/assets/ee090774-0082-4cda-97d0-416148aca853" />
+
+
 
