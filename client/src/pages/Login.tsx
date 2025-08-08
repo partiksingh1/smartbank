@@ -11,6 +11,14 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Modal state for password reset
+    const [showModal, setShowModal] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [otp, setOtp] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -21,13 +29,34 @@ const Login: React.FC = () => {
         try {
             const response = await authAPI.login({ email, password });
             console.log(response);
-
             login(response.data.token, response.data.user);
             navigate('/dashboard');
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Login failed');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePasswordResetRequest = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await authAPI.requestPasswordReset({ email: resetEmail });
+            toast.success('OTP sent to your email');
+            setOtpSent(true);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to send OTP');
+        }
+    };
+
+    const handlePasswordReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await authAPI.resetPassword({ email: resetEmail, otp, newPassword });
+            toast.success('Password reset successful');
+            setShowModal(false); // Close modal after successful reset
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Password reset failed');
         }
     };
 
@@ -104,8 +133,98 @@ const Login: React.FC = () => {
                             Don't have an account? Sign up
                         </Link>
                     </div>
+
+                    {/* Forgot Password Link */}
+                    <div className="mt-2 text-center">
+                        <button
+                            type="button"
+                            onClick={() => setShowModal(true)}
+                            className="text-blue-600 hover:text-blue-500"
+                        >
+                            Forgot your password?
+                        </button>
+                    </div>
                 </form>
             </div>
+
+            {/* Password Reset Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-10 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 w-96">
+                        <h2 className="text-xl font-bold mb-4">Reset your password</h2>
+
+                        {/* Request OTP Form */}
+                        {!otpSent ? (
+                            <form onSubmit={handlePasswordResetRequest}>
+                                <div className="mb-4">
+                                    <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700">
+                                        Enter your email
+                                    </label>
+                                    <input
+                                        id="resetEmail"
+                                        type="email"
+                                        required
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Enter your email"
+                                        value={resetEmail}
+                                        onChange={(e) => setResetEmail(e.target.value)}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-600 text-white py-2 rounded-md"
+                                >
+                                    Send OTP
+                                </button>
+                            </form>
+                        ) : (
+                            <form onSubmit={handlePasswordReset}>
+                                <div className="mb-4">
+                                    <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                                        OTP
+                                    </label>
+                                    <input
+                                        id="otp"
+                                        type="text"
+                                        required
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Enter OTP"
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                                        New Password
+                                    </label>
+                                    <input
+                                        id="newPassword"
+                                        type="password"
+                                        required
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Enter new password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-600 text-white py-2 rounded-md"
+                                >
+                                    Reset Password
+                                </button>
+                            </form>
+                        )}
+
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="mt-4 w-full bg-gray-200 py-2 rounded-md text-center"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

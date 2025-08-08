@@ -11,6 +11,9 @@ export interface LoginRequest {
     email: string;
     password: string;
 }
+export interface OtpRequest {
+    email: string;
+}
 
 export interface LoginResponse {
     token: string;
